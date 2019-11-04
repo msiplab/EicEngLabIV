@@ -22,6 +22,7 @@ uint32_T aqm0802Setup()
         if (gpioInitialise() < 0)
         {
             // pigpio initalization failed.
+            return 1;
         }
     }
     
@@ -45,11 +46,11 @@ uint32_T aqm0802Setup()
 
 void aqm0802Release(uint32_T h)
 {
-    i2cClose(h);
-    //if (gpioCfgInterfaces(0)==PI_INITIALISED)
-    //{
-    //    gpioTerminate();
-    //}
+    if (gpioCfgInterfaces(0)==PI_INITIALISED)
+    {
+        i2cClose(h);
+        gpioTerminate();
+    }
 }
 
 // Write a string to display

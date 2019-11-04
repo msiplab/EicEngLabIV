@@ -37,6 +37,7 @@ classdef Aqm0802 < matlab.System ...
         function setupImpl(obj) 
             if isempty(coder.target)
                 % Place simulation setup code here
+                % remote connection?
             else
                 % Call C-function implementing device initialization
                 coder.cinclude('aqm0802_raspi.h');
@@ -47,6 +48,7 @@ classdef Aqm0802 < matlab.System ...
         function stepImpl(obj,line1,line2)  
             if isempty(coder.target)
                 % Place simulation output code here
+                % remote connection?
                 %disp(line1)
                 %disp(line2)
             else

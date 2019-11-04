@@ -3,17 +3,11 @@ classdef Aqm0802 < matlab.System ...
         & matlab.system.mixin.Propagates ...
         & matlab.system.mixin.CustomIcon
     %
-    % System object template for a sink block.
+    % System object for AQM0802 block.
     % 
-    % This template includes most, but not all, possible properties,
-    % attributes, and methods that you can implement for a System object in
-    % Simulink.
-    %
-    % NOTE: When renaming the class name Sink, the file name and
-    % constructor name must be updated to use the class name.
     %
     
-    % Copyright 2016-2018 The MathWorks, Inc.
+    % Copyright 2019 Shogo MURAMATSU
     %#codegen
     %#ok<*EMCA>
     
@@ -40,7 +34,7 @@ classdef Aqm0802 < matlab.System ...
     end
     
     methods (Access=protected)
-        function setupImpl(obj) %#ok<MANU>
+        function setupImpl(obj) 
             if isempty(coder.target)
                 % Place simulation setup code here
             else
@@ -50,19 +44,21 @@ classdef Aqm0802 < matlab.System ...
             end
         end
         
-        function stepImpl(obj,line1,line2)  %#ok<INUSD>
+        function stepImpl(obj,line1,line2)  
             if isempty(coder.target)
                 % Place simulation output code here
                 %disp(line1)
                 %disp(line2)
             else
                 % Call C-function implementing device output
-                coder.ceval('writeLine', line1, 0);
-                coder.ceval('writeLine', line2, 1);
+                len1 = length(line1);
+                len2 = length(line2);
+                coder.ceval('writeLine', obj.hAqm0802,0,line1,len1);
+                coder.ceval('writeLine', obj.hAqm0802,1,line2,len2);
             end
         end
         
-        function releaseImpl(obj) %#ok<MANU>
+        function releaseImpl(obj) 
             if isempty(coder.target)
                 % Place simulation termination code here
             else
@@ -130,7 +126,7 @@ classdef Aqm0802 < matlab.System ...
         function updateBuildInfo(buildInfo, context)
             if context.isCodeGenTarget('rtw')
                 % Update buildInfo
-                srcDir = fullfile(fileparts(mfilename('fullpath')),'src'); %#ok<NASGU>
+                srcDir = fullfile(fileparts(mfilename('fullpath')),'src'); 
                 includeDir = fullfile(fileparts(mfilename('fullpath')),'include');
                 addIncludePaths(buildInfo,includeDir);
                 % Use the following API's to add include files, sources and

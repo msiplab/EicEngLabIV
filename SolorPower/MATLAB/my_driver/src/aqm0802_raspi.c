@@ -1,3 +1,6 @@
+/*
+ * http://abyz.me.uke/rpi/pigpio/cif.html
+ */
 #include <pigpio.h>
 #include <unistd.h>
 #include "aqm0802_raspi.h"
@@ -7,6 +10,8 @@
 #define I2C_FLAGS 0
 #define REG_ADDR_INST 0x00
 #define REG_ADDR_DATA 0x40
+#define DDRAM_ADDR_LINE1 0x00
+#define DDRAM_ADDR_LINE2 0x40
 
 uint32_T aqm0802Setup()
 {
@@ -34,8 +39,6 @@ uint32_T aqm0802Setup()
     i2cWriteByteData(h,REG_ADDR_INST,0x01); // Clear Display
     usleep(1000); // Sleep 1ms
     
-    i2cWriteByteData(h,REG_ADDR_DATA,0x41);
-    
     return h;
     
 }
@@ -50,7 +53,15 @@ void aqm0802Release(uint32_T h)
 }
 
 // Write a string to display
-void writeLine(uint8_T* line, uint8_T idx)
+void writeLine(uint32_T h, uint8_T idx, uint8_T *line, uint8_T size)
 {
-   //
-}
+    if (idx == 0)
+    {
+        i2cWriteByteData(h,REG_ADDR_INST,0x80); // Move to Line1
+    }
+    else
+    {
+        i2cWriteByteData(h,REG_ADDR_INST,0xc0); // Move to Line2     
+    }
+    i2cWriteI2CBlockData(h,REG_ADDR_DATA,line,size);
+ }

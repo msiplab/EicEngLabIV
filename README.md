@@ -33,6 +33,7 @@ Visual Studio (VS) Codeはソースコードエディタである。Windows，Li
 
 - URL：https://code.visualstudio.com/
 - URL：https://code.visualstudio.com/docs/python/python-tutorial
+- URL：https://www.python.org/downloads/
 - 利用方法：ローカルのPCにダウンロードしてインストール
 　　
 ## ４．	レポート形式

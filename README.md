@@ -32,6 +32,7 @@ Google Colaboratoryは，Google社が機械学習の教育や研究用に提供�
 Visual Studio (VS) Codeはソースコードエディタである。Windows，Linux，macOS上で動作し，無償で利用できる。別途，Python の環境を準備する必要があるが，VS Code にPython拡張機能をインストールすることで，Jupyter Notebook 機能もエディタ内で動作するようになる。
 
 - URL：https://code.visualstudio.com/
+- URL: https://code.visualstudio.com/docs/python/python-tutorial
 - 利用方法：ローカルのPCにダウンロードしてインストール
 　　
 ## ４．	レポート形式

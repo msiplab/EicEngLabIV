@@ -63,7 +63,7 @@ Microsoft Office Lens は写真をPDFに変更するアプリである。パソ�
 
 ## ６．リンク
 
-1.  [BDARC学生勉強会:https://bdarc.net/]
+1.  [BDARC学生勉強会](https://bdarc.net/)
 
 ---
 新潟大学工学部工学科　電子情報通信プログラム　村松正吾

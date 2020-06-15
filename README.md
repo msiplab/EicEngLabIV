@@ -61,9 +61,21 @@ Microsoft Office Lens は写真をPDFに変更するアプリである。パソ�
 1.  最適化手法入門／寒野善博ほか／講談社
 1.	インストールいらずのLATEX入門 ―Overleafで手軽に文書作成／坂東慶太ほか／東京図書
 
-## ６．リンク
+## 付録
 
-1.  [BDARC学生勉強会](https://bdarc.net/)
+### 参考サイト
+
+Python の自学習に役立つサイトを以下にまとめる。
+
+1.  [新潟大学BDARC学生勉強会](https://bdarc.net/)
+
+### 他のプログラミング言語
+
+Pythonの代替となる他のプログラミング言語を以下にまとめる。
+
+1. [MATLAB/Simulink](https://jp.mathworks.com/)
+1. [Julia](https://julialang.org/)
+1. [R](https://www.r-project.org/)
 
 ---
 新潟大学工学部工学科　電子情報通信プログラム　村松正吾

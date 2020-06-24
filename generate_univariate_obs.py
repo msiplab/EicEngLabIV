@@ -50,4 +50,4 @@ if __name__ == '__main__':
     ax.set_xlim([minx-0.1*rx,maxx+0.1*rx])
     ax.set_ylim([miny-0.1*ry,maxy+0.1*ry])
     ax.grid(True)
-    plt.show(5)
+    plt.show()

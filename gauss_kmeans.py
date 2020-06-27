@@ -13,6 +13,7 @@ Copyright (c) 2020, Shogo MURAMATSU, All rights reserved.
 import numpy as np
 import pandas as pd 
 from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -65,24 +66,25 @@ class GaussianFeaturesWithKmeans(BaseEstimator, TransformerMixin):
 
     @staticmethod
     def _gauss_basis(x, y, width, axis=None):
-        if any(width==0):
-            raise ValueError('基底関数が多すぎるようです')
-        else:
-            arg = (x - y) / width
+        arg = (x - y) / (width + 1e-300)
         return np.exp(-0.5 * np.sum(arg ** 2, axis))
 
     def fit(self, X, y=None):
         ndims = X.shape[1]
         if self.prekmeans:
+            scaler = StandardScaler()         
             kmeans = KMeans(n_clusters=self.nbfs,random_state=0)
+            X = scaler.fit_transform(X)
             kmeans.fit(X)
+
             labels = kmeans.predict(X).reshape(-1,1)
             clusters = pd.DataFrame(np.concatenate((labels,X),axis=1)).groupby([0])
             if ndims == 1:
-                self.centers_ = kmeans.cluster_centers_.reshape(-1,)
+                self.centers_ = scaler.inverse_transform(kmeans.cluster_centers_).reshape(-1,)
+                self.widths_ = (self.width_factor * scaler.scale_ * clusters.std(ddof=0)).to_numpy().reshape(-1,)
             else:
-                self.centers_ = kmeans.cluster_centers_.reshape(-1,ndims,1).transpose(2,1,0)                
-            self.widths_ = self.width_factor * np.sqrt(clusters.var(ddof=0).sum(axis=1)).to_numpy()
+                self.centers_ = scaler.inverse_transform(kmeans.cluster_centers_).reshape(-1,ndims,1).transpose(2,1,0) 
+                self.widths_ = (self.width_factor * scaler.scale_ * clusters.std(ddof=0)).to_numpy().reshape(-1,ndims,1).transpose(2,1,0)
         else:
             if ndims == 1:
                 self.centers_ = np.linspace(X.min(), X.max(), self.nbfs) 
@@ -122,22 +124,22 @@ if __name__ == '__main__':
     ax1.set_xlim(0,10)
     plt.show()
     '''
-    
+
     # 重回帰
-    M = 6
+    M = 8
     width_factor = 1.0
-    nSamples = 100
+    nSamples = 1000
     rng = np.random.RandomState(1)    
-    x1 = 10 * rng.rand(nSamples)
+    x1 = 0.1 * rng.rand(nSamples)
     x2 = 10 * rng.rand(nSamples)
     X = np.concatenate((x1.reshape(-1,1),x2.reshape(-1,1)),axis=1)
-    y = np.sin(x1) + np.cos(x2) + 0.1 * rng.randn(nSamples)
+    y = np.sin(100*x1) + np.cos(x2) + 0.01 * rng.randn(nSamples)
     phi2 = GaussianFeaturesWithKmeans(M,width_factor=width_factor,prekmeans=True) 
     gauss_model2 = make_pipeline(phi2,LinearRegression())
     gauss_model2.fit(X,y)
 
     nPoints = 100
-    xfit1,xfit2 = np.meshgrid(np.linspace(0, 10, nPoints),
+    xfit1,xfit2 = np.meshgrid(np.linspace(0, 0.1, nPoints),
                                 np.linspace(0, 10, nPoints))
     Xfit  = np.concatenate([xfit1.reshape(-1,1),xfit2.reshape(-1,1)],axis=1)
     yfit  = gauss_model2.predict(Xfit).reshape(xfit1.shape)
@@ -145,7 +147,7 @@ if __name__ == '__main__':
     ax = plt.axes(projection='3d')
     ax.scatter(x1,x2,y)
     ax.plot_wireframe(xfit1,xfit2,yfit, color = 'red')
-    ax.set_xlim(0,10)
+    ax.set_xlim(0,0.1)
     ax.set_ylim(0,10)
     plt.show()
 

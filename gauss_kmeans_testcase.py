@@ -14,6 +14,7 @@ import unittest
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
 from numpy.testing import assert_array_equal
 from gauss_kmeans import GaussianFeaturesWithKmeans
 
@@ -93,21 +94,24 @@ class GaussianFeaturesWithKMeansTestCase(unittest.TestCase):
         x = 10 * rng.rand(nSamples)
         y = np.sin(x) + 0.1 * rng.randn(nSamples)
         X = x.reshape(-1,1)
-        kmeans = KMeans(n_clusters=M,random_state=0)
-        kmeans.fit(X)
+
 
         # ターゲットのインスタンス化
         phi = GaussianFeaturesWithKmeans(nbfs=M,prekmeans=True)
         phi.fit(X)
 
         # 期待値
+        scaler = StandardScaler()
+        kmeans = KMeans(n_clusters=M,random_state=0)
+        X = scaler.fit_transform(X)        
+        kmeans.fit(X)
         expctd_nbfs = M
         expctd_width_factor = 1.0
         expctd_prekmeans = True
-        expctd_centers = kmeans.cluster_centers_.reshape(-1,)
+        expctd_centers = scaler.inverse_transform(kmeans.cluster_centers_).reshape(-1,)
         labels = kmeans.predict(X).reshape(-1,1)
         clusters = pd.DataFrame(np.concatenate((labels,X),axis=1)).groupby([0])
-        expctd_widths = clusters.std(ddof=0).to_numpy().reshape(-1,)
+        expctd_widths = (scaler.scale_ * clusters.std(ddof=0)).to_numpy().reshape(-1,)
 
         # 実現値
         actual_nbfs = phi.nbfs
@@ -126,29 +130,31 @@ class GaussianFeaturesWithKMeansTestCase(unittest.TestCase):
     def test_x2d_w_kmeans(self):
         """K平均法前処理，二変量のテスト"""
 
-           # 設定
+        # 設定
         M = 10
         nSamples = 50
         rng = np.random.RandomState(1)
         x1 = 10 * rng.rand(nSamples)
-        x2 = 10 * rng.rand(nSamples)
+        x2 = 0.1 * rng.rand(nSamples)
         X = np.concatenate((x1.reshape(-1,1),x2.reshape(-1,1)),axis=1)
         y = np.sin(x1) + np.cos(x2) + 0.1 * rng.randn(nSamples)
-        kmeans = KMeans(n_clusters=M,random_state=0)
-        kmeans.fit(X)
 
         # ターゲットのインスタンス化
         phi = GaussianFeaturesWithKmeans(nbfs=M,prekmeans=True)
         phi.fit(X)
 
         # 期待値
+        scaler = StandardScaler()
+        kmeans = KMeans(n_clusters=M,random_state=0)
+        X = scaler.fit_transform(X)
+        kmeans.fit(X)
         expctd_nbfs = M
         expctd_width_factor = 1.0
         expctd_prekmeans = True
-        expctd_centers = kmeans.cluster_centers_.reshape(-1,2,1).transpose(2,1,0)
+        expctd_centers = scaler.inverse_transform(kmeans.cluster_centers_).reshape(-1,2,1).transpose(2,1,0)
         labels = kmeans.predict(X).reshape(-1,1)
         clusters = pd.DataFrame(np.concatenate((labels,X),axis=1)).groupby([0])
-        expctd_widths = np.sqrt(clusters.var(ddof=0).sum(axis=1)).to_numpy()
+        expctd_widths = (scaler.scale_ * clusters.std(ddof=0)).to_numpy().reshape(-1,2,1).transpose(2,1,0)
         
         # 実現値
         actual_nbfs = phi.nbfs

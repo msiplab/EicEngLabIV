@@ -1,13 +1,5 @@
 """GaussianFeaturesWithKmenasテストケース
 
-        *
-        *
-
-    Todo:
-
-        *
-        *
-
     Copyright (c) 2020, Shogo MURAMATSU, All rights reserved.
 """
 import unittest

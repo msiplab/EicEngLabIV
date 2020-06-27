@@ -123,7 +123,7 @@ class GaussianFeaturesWithKMeansTestCase(unittest.TestCase):
         assert_array_equal(actual_widths,expctd_widths,'widths')
         assert_array_equal(actual_centers,expctd_centers,'centers')
 
-    def ttest_x2d_w_kmeans(self):
+    def test_x2d_w_kmeans(self):
         """K平均法前処理，二変量のテスト"""
 
            # 設定
@@ -132,8 +132,8 @@ class GaussianFeaturesWithKMeansTestCase(unittest.TestCase):
         rng = np.random.RandomState(1)
         x1 = 10 * rng.rand(nSamples)
         x2 = 10 * rng.rand(nSamples)
-        y = np.sin(x1) + np.cos(x2) + 0.1 * rng.randn(nSamples)
         X = np.concatenate((x1.reshape(-1,1),x2.reshape(-1,1)),axis=1)
+        y = np.sin(x1) + np.cos(x2) + 0.1 * rng.randn(nSamples)
         kmeans = KMeans(n_clusters=M,random_state=0)
         kmeans.fit(X)
 
@@ -145,10 +145,10 @@ class GaussianFeaturesWithKMeansTestCase(unittest.TestCase):
         expctd_nbfs = M
         expctd_width_factor = 1.0
         expctd_prekmeans = True
-        expctd_centers = kmeans.cluster_centers_
+        expctd_centers = kmeans.cluster_centers_.reshape(-1,2,1).transpose(2,1,0)
         labels = kmeans.predict(X).reshape(-1,1)
         clusters = pd.DataFrame(np.concatenate((labels,X),axis=1)).groupby([0])
-        expctd_widths = np.sqrt(clusters.var(ddof=0).sum(axis=1))
+        expctd_widths = np.sqrt(clusters.var(ddof=0).sum(axis=1)).to_numpy()
         
         # 実現値
         actual_nbfs = phi.nbfs

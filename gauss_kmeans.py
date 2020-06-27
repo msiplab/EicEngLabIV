@@ -10,7 +10,6 @@
 
 Copyright (c) 2020, Shogo MURAMATSU, All rights reserved.
 """
-import sys
 import numpy as np
 import pandas as pd 
 from sklearn.cluster import KMeans
@@ -58,7 +57,6 @@ class GaussianFeaturesWithKmeans(BaseEstimator, TransformerMixin):
 
         Note:
 
-
             (c) Copyright, Shogo MURAMATSU, All rights reserved
         """
         self.nbfs = nbfs
@@ -74,9 +72,8 @@ class GaussianFeaturesWithKmeans(BaseEstimator, TransformerMixin):
         return np.exp(-0.5 * np.sum(arg ** 2, axis))
 
     def fit(self, X, y=None):
-        # print('fit')        
+        ndims = X.shape[1]
         if self.prekmeans:
-            ndims = X.shape[1]
             kmeans = KMeans(n_clusters=self.nbfs,random_state=0)
             kmeans.fit(X)
             labels = kmeans.predict(X).reshape(-1,1)
@@ -84,53 +81,72 @@ class GaussianFeaturesWithKmeans(BaseEstimator, TransformerMixin):
             if ndims == 1:
                 self.centers_ = kmeans.cluster_centers_.reshape(-1,)
             else:
-                self.centers_ = kmeans.cluster_centers_.reshape(-1,ndims)                
+                self.centers_ = kmeans.cluster_centers_.reshape(-1,ndims,1).transpose(2,1,0)                
             self.widths_ = self.width_factor * np.sqrt(clusters.var(ddof=0).sum(axis=1)).to_numpy()
         else:
-            self.centers_ = np.linspace(X.min(), X.max(), self.nbfs) 
-            self.widths_ = self.width_factor * (self.centers_[1] - self.centers_[0]) * np.ones(self.nbfs)
-            #print(self.centers_.shape)
-            #print(self.widths_.shape)       
+            if ndims == 1:
+                self.centers_ = np.linspace(X.min(), X.max(), self.nbfs) 
+                self.widths_ = self.width_factor * (self.centers_[1] - self.centers_[0]) * np.ones(self.nbfs)
+            else:
+                raise Exception('prekmeansを True に設定してください．重回帰はK平均法による事前推定のみ対応しています．')        
+        
         return self
 
     def transform(self, X):
-        # print('transform')
         return self._gauss_basis(X[:,:, np.newaxis], self.centers_,
                                 self.widths_, axis=1)
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt 
     import seaborn as sns; sns.set()
-    
+    rng = np.random.RandomState()
+
+    '''
     # 単回帰
-    M = 10
-    nSamples = 50
-    rng = np.random.RandomState(1)
+    M = 3
+    width_factor = 1.0
+    nSamples = 100
     x = 10 * rng.rand(nSamples)
     y = np.sin(x) + 0.1 * rng.randn(nSamples)
 
-    phi = GaussianFeaturesWithKmeans(M,width_factor=1.0,prekmeans=True)
-    gauss_model = make_pipeline(phi,LinearRegression())
-    gauss_model.fit(x[:, np.newaxis], y)
-    xfit = np.linspace(0, 10, 1000)
-    yfit = gauss_model.predict(xfit[:,np.newaxis])
-    
-    fig, ax = plt.subplots()
-    ax.scatter(x,y)
-    ax.plot(xfit,yfit)
-    ax.set_xlim(0,10)
+    phi1 = GaussianFeaturesWithKmeans(M,width_factor=width_factor,prekmeans=True)
+    gauss_model1 = make_pipeline(phi1,LinearRegression())
+    gauss_model1.fit(x.reshape(-1,1), y)
+
+    fig1, ax1 = plt.subplots()
+    nPoints = 1000
+    xfit = np.linspace(0, 10, nPoints)
+    yfit = gauss_model1.predict(xfit.reshape(-1,1))
+    ax1.scatter(x,y)
+    ax1.plot(xfit,yfit,color='red')
+    ax1.set_xlim(0,10)
     plt.show()
+    '''
     
     # 重回帰
-            #
-        #from sklearn.linear_model import LinearRegression 
-        #from sklearn.pipeline import make_pipeline
-        #mymodel = make_pipeline(phi,LinearRegression())
-        #mymodel.fit(X[:,:,np.newaxis],y)
-        #xfit1,xfit2 = np.meshgrid(np.linspace(minx1,maxx1,nPoints),
-        #                         np.linspace(minx2,maxx2,nPoints))
-        #Xfit  = np.concatenate([xfit1.reshape(-1,1),xfit2.reshape(-1,1)],axis=1)
-        #yfit  = mymodel.predict(Xfit).reshape(xfit1.shape)
-        #ax.scatter(x1,x2,y)
-        #ax.plot_wireframe(xfit1,xfit2,yfit, color = 'red')
-        #yfit = mymodel.predict(xfit[:,np.newaxis])
+    M = 6
+    width_factor = 1.0
+    nSamples = 100
+    rng = np.random.RandomState(1)    
+    x1 = 10 * rng.rand(nSamples)
+    x2 = 10 * rng.rand(nSamples)
+    X = np.concatenate((x1.reshape(-1,1),x2.reshape(-1,1)),axis=1)
+    y = np.sin(x1) + np.cos(x2) + 0.1 * rng.randn(nSamples)
+    phi2 = GaussianFeaturesWithKmeans(M,width_factor=width_factor,prekmeans=True) 
+    gauss_model2 = make_pipeline(phi2,LinearRegression())
+    gauss_model2.fit(X,y)
+
+    nPoints = 100
+    xfit1,xfit2 = np.meshgrid(np.linspace(0, 10, nPoints),
+                                np.linspace(0, 10, nPoints))
+    Xfit  = np.concatenate([xfit1.reshape(-1,1),xfit2.reshape(-1,1)],axis=1)
+    yfit  = gauss_model2.predict(Xfit).reshape(xfit1.shape)
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.scatter(x1,x2,y)
+    ax.plot_wireframe(xfit1,xfit2,yfit, color = 'red')
+    ax.set_xlim(0,10)
+    ax.set_ylim(0,10)
+    plt.show()
+
+    

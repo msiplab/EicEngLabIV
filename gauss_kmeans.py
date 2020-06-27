@@ -76,15 +76,21 @@ class GaussianFeaturesWithKmeans(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         # print('fit')        
         if self.prekmeans:
+            ndims = X.shape[1]
             kmeans = KMeans(n_clusters=self.nbfs,random_state=0)
             kmeans.fit(X)
             labels = kmeans.predict(X).reshape(-1,1)
             clusters = pd.DataFrame(np.concatenate((labels,X),axis=1)).groupby([0])
-            self.centers_ = kmeans.cluster_centers_.reshape(-1,)
-            self.widths_ = self.width_factor * clusters.std(ddof=0).to_numpy().reshape(-1,)
+            if ndims == 1:
+                self.centers_ = kmeans.cluster_centers_.reshape(-1,)
+            else:
+                self.centers_ = kmeans.cluster_centers_.reshape(-1,ndims)                
+            self.widths_ = self.width_factor * np.sqrt(clusters.var(ddof=0).sum(axis=1)).to_numpy()
         else:
-            self.centers_ = np.linspace(X.min(), X.max(), self.nbfs)
+            self.centers_ = np.linspace(X.min(), X.max(), self.nbfs) 
             self.widths_ = self.width_factor * (self.centers_[1] - self.centers_[0]) * np.ones(self.nbfs)
+            #print(self.centers_.shape)
+            #print(self.widths_.shape)       
         return self
 
     def transform(self, X):
@@ -96,6 +102,7 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt 
     import seaborn as sns; sns.set()
     
+    # 単回帰
     M = 10
     nSamples = 50
     rng = np.random.RandomState(1)
@@ -114,3 +121,16 @@ if __name__ == '__main__':
     ax.set_xlim(0,10)
     plt.show()
     
+    # 重回帰
+            #
+        #from sklearn.linear_model import LinearRegression 
+        #from sklearn.pipeline import make_pipeline
+        #mymodel = make_pipeline(phi,LinearRegression())
+        #mymodel.fit(X[:,:,np.newaxis],y)
+        #xfit1,xfit2 = np.meshgrid(np.linspace(minx1,maxx1,nPoints),
+        #                         np.linspace(minx2,maxx2,nPoints))
+        #Xfit  = np.concatenate([xfit1.reshape(-1,1),xfit2.reshape(-1,1)],axis=1)
+        #yfit  = mymodel.predict(Xfit).reshape(xfit1.shape)
+        #ax.scatter(x1,x2,y)
+        #ax.plot_wireframe(xfit1,xfit2,yfit, color = 'red')
+        #yfit = mymodel.predict(xfit[:,np.newaxis])

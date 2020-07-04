@@ -77,5 +77,10 @@ Pythonの代替となる他のプログラミング言語を以下にまとめ�
 1. [Julia](https://julialang.org/)
 1. [R](https://www.r-project.org/)
 
+## リンク
+
+- [プログラミングBI/BII](https://github.com/msiplab/EicProgLab)
+- [電子情報通信設計製図](https://github.com/msiplab/EicDesignLab)
+
 ---
 新潟大学工学部工学科　電子情報通信プログラム　村松正吾

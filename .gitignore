@@ -6,3 +6,8 @@ data/sample02_org.txt
 data/sample03_org.txt
 data/practice*.*
 data/*.zip
+**/slprj/*
+**/*_ert_rtw/*
+*.elf
+*.slx.r*
+*.slxc

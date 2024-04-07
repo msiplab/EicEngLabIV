@@ -36,6 +36,13 @@ Visual Studio (VS) Codeはソースコードエディタである。Windows，Li
 - URL：https://www.python.org/downloads/
 - 利用方法：ローカルのPCにダウンロードしてインストール
 　　
+
+### Mathworks MATLAB/Simulink
+[![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=msiplab/EicLabIV)
+新潟大学では，数値解析ソフトウェアMATLAB の大学包括ライセンス（ Campus-Wide License）を導入しており，すべての学生，教職員，および研究者が，キャンパスの内外を問わず，あらゆるデバイスでMATLAB，Simulink，およびオンライン学習ツールを無制限に使用することができる。
+
+- URL：https://www.cais.niigata-u.ac.jp/service/software/matlab/
+
 ## ４．	レポート形式
 レポート提出は学務情報システムからテーマ毎に設定する期日までに行ってもらう。A4サイズ縦置きPDF形式とする。PDFファイルは，MS Word やLaTeXなどのワープロソフトで作成すればよい。以下では，オンラインで利用できるLaTeX原稿執筆環境としてOverleafを，手書きのレポートをPDF化できるMicrosoft Office Lensを紹介する。
 
@@ -65,7 +72,6 @@ Microsoft Office Lens は写真をPDFに変更するアプリである。パソ�
 1.  時系列解析／島田直希／共立出版
 1.  時系列解析入門〔第２版〕／宮野尚哉・後藤田浩／サイエンス社
 1.  インストールいらずのLATEX入門 ―Overleafで手軽に文書作成／坂東慶太ほか／東京図書
-
 
 ## 付録
 
